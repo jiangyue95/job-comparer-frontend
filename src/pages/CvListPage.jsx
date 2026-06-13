@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { listCvs, createCv } from "../api/cvApi";
+import { Link } from "react-router-dom";
 
 function CvListPage() {
     // List data
@@ -96,14 +97,16 @@ function CvListPage() {
 
                     <ul className="space-y-3">
                         {cvs.map((cv) => (
-                            <li 
-                                key={cv.id}
-                                className="p-4 bg-white border border-gray-200 rounded-md hover:bg-blue-50 hover:border-blue-400 transition-colors"
-                            >
-                                <div className="font-semibold text-gray-900">{cv.cvName}</div>
-                                <div className="text-sm text-gray-500 mt-1">
-                                    Created at {new Date(cv.createdAt).toLocaleString()}
-                                </div>
+                            <li key={cv.id}>
+                                <Link
+                                    to={`/cvs/${cv.id}`}
+                                    className="block p-4 bg-white border border-gray-200 rounded-md hover:bg-blue-50 hover:border-blue-400 transition-colors"
+                                >
+                                    <div className="font-semibold text-gray-900">{cv.cvName}</div>
+                                    <div className="text-sm text-gray-500 mt-1">
+                                        Created at {new Date(cv.createdAt).toLocaleString()}
+                                    </div>
+                                </Link>
                             </li>
                         ))}
                     </ul>

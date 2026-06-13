@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
 import LoginPage from "./pages/LoginPage"
 import DashboardPage from "./pages/DashboardPage"
 import CvListPage from "./pages/CvListPage"
+import CvDetailPage from "./pages/CvDetailPage"
 import ProtectedRoute from "./components/ProtectedRoute"
 import JobListPage from "./pages/JobListPage"
 import AnalysisPage from "./pages/AnalysisPage"
@@ -38,6 +39,14 @@ function App() {
               <CvListPage />
             </ProtectedRoute>
           } 
+        />
+        <Route
+          path="/cvs/:id"
+          element={
+            <ProtectedRoute>
+              <CvDetailPage />
+            </ProtectedRoute>
+          }
         />
         <Route 
           path="/jobs" 
