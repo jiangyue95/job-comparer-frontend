@@ -9,7 +9,7 @@ export function getCv(id) {
 }
 
 export function createCv(cvName, content) {
-    return apiRequest('api/cvs', {
+    return apiRequest('/api/cvs', {
         method: 'POST',
         body: { cvName, content },
     })
