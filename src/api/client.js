@@ -25,5 +25,10 @@ export async function apiRequest(path, options = {}) {
         throw new Error(errorBody.message || `HTTP ${response.status}`)
     }
 
+    // 204 No Content, directly return null
+    if (response.status === 204) {
+        return null
+    }
+
     return response.json()
 }
