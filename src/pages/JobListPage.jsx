@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { JOB_STATUS, JOB_STATUS_OPTIONS } from "../constants/jobStatus";
+import { JOB_STATUS, JOB_STATUS_OPTIONS, STATUS_COLORS } from "../constants/jobStatus";
 import { createJob, listJobs } from "../api/jobApi";
+import { Link } from "react-router-dom";
 
 // The initial empty state of form(Using a constant because it needs to be 
 // reused during reset)
@@ -11,16 +12,6 @@ const EMPTY_FORM = {
     jobUrl: '',
     status: JOB_STATUS.SAVED,
     notes: '',
-}
-
-const STATUS_COLORS = {
-  SAVED: 'bg-gray-100 text-gray-800',
-  APPLIED: 'bg-blue-100 text-blue-800',
-  INTERVIEWING: 'bg-yellow-100 text-yellow-800',
-  OFFERED: 'bg-green-100 text-green-800',
-  REJECTED: 'bg-red-100 text-red-800',
-  DECLINED: 'bg-orange-100 text-orange-800',
-  ARCHIVED: 'bg-gray-100 text-gray-500',
 }
 
 function JobListPage() {
@@ -168,10 +159,11 @@ function JobListPage() {
                     {!loading && jobs.length === 0 && <p>No jobs yet.</p>}
                     <ul className="space-y-3">
                         {jobs.map((job) => (
-                            <li 
-                                key={job.id}
-                                className="p-4 border border-gray-200 rounded-md"
-                            >
+                            <li key={job.id}>
+                                <Link
+                                    to={`/jobs/${job.id}`}
+                                    className="block p-4 bg-white border border-gray-200 rounded-md hover:bg-blue-50 hover:border-blue-400 transition-colors"
+                                >
                                 {/* First line: title + status badge */}
                                 <div className="flex justify-between items-start">
                                     <div>
@@ -183,20 +175,11 @@ function JobListPage() {
                                     </span>
                                 </div>
 
-                                {/* Second line: date + link */}
+                                {/* Second line: date */}
                                 <div className="flex justify-between items-center mt-2 text-sm text-gray-500">
                                     <span>Created at {new Date(job.createdAt).toLocaleString()}</span>
-                                    {job.jobUrl && (
-                                        <a 
-                                            href={job.jobUrl} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 hover:text-blue-800"
-                                        >
-                                            View Link
-                                        </a>
-                                    )}
                                 </div>
+                                </Link>
                             </li>
                         ))}
                     </ul>

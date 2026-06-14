@@ -5,6 +5,7 @@ import CvListPage from "./pages/CvListPage"
 import CvDetailPage from "./pages/CvDetailPage"
 import ProtectedRoute from "./components/ProtectedRoute"
 import JobListPage from "./pages/JobListPage"
+import JobDetailPage from "./pages/JobDetailPage"
 import AnalysisPage from "./pages/AnalysisPage"
 
 function App() {
@@ -55,6 +56,14 @@ function App() {
               <JobListPage />
             </ProtectedRoute>
           } 
+        />
+        <Route
+          path="/jobs/:id"
+          element={
+            <ProtectedRoute>
+              <JobDetailPage />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/analyze"
