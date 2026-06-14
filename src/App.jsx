@@ -7,22 +7,12 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import JobListPage from "./pages/JobListPage"
 import JobDetailPage from "./pages/JobDetailPage"
 import AnalysisPage from "./pages/AnalysisPage"
+import Navbar from "./components/Navbar"
 
 function App() {
   return (
     <BrowserRouter>
-      <nav>
-        <Link to="/dashboard">Dashboard</Link>
-        {' | '}
-        <Link to="/cvs">CVs</Link>
-        {' | '}
-        <Link to="/jobs">Jobs</Link>
-        {' | '}
-        <Link to="/analyze">Analyze</Link>
-        {' | '}
-        <Link to="/login">Login</Link>
-      </nav>
-
+      <Navbar />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route 
