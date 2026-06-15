@@ -6,3 +6,10 @@ export function login(email, password) {
         body: { email, password},
     })
 }
+
+export function register(username, email, password) {
+    return apiRequest('/api/auth/register', {
+        method: 'POST',
+        body: { username, email, password },
+    })
+}
