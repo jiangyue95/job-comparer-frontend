@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { login as apiLogin } from "../api/authApi"
 import { useAuth } from '../context/AuthContext'
 
@@ -64,8 +64,8 @@ function LoginPage() {
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         disabled={loading}
                         className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
                     >
@@ -76,6 +76,13 @@ function LoginPage() {
                 {error && (
                     <p className="mt-4 text-sm text-red-600 text-center">{error}</p>
                 )}
+
+                <p className="mt-4 text-sm text-gray-600 text-center">
+                    Don't have an account?{' '}
+                    <Link to="/register" className="text-blue-600 hover:text-blue-800">
+                        Sign up
+                    </Link>
+                </p>
             </div>
         </div>
     )
