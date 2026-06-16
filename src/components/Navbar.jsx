@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 
 function Navbar() {
-    const { isAuthenticated, logout } = useAuth()
+    const { isAuthenticated, logout, user } = useAuth()
     const navigate = useNavigate()
 
     function handleLogout() {
@@ -33,13 +33,20 @@ function Navbar() {
                     <NavLink to="/analyze" className={linkClass}>Analyze</NavLink>
                 </div>
 
-                {/* Right side: logout */}
-                <button
-                    onClick={handleLogout}
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                >
-                    Logout
-                </button>
+                {/* Right side: username + logout */}
+                <div className="flex items-center gap-4">
+                    {user && (
+                        <span className="text-sm text-gray-700">
+                            Hi, {user.username}
+                        </span>
+                    )}
+                    <button
+                        onClick={handleLogout}
+                        className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                    >
+                        Logout
+                    </button>
+                </div>
             </div>
         </nav>
     )
