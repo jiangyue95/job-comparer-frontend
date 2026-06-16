@@ -13,3 +13,9 @@ export function register(username, email, password) {
         body: { username, email, password },
     })
 }
+
+export function getCurrentUser() {
+    return apiRequest('/api/users/me', {
+        method: 'GET',
+    })
+}
