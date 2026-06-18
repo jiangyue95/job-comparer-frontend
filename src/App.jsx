@@ -9,13 +9,19 @@ import JobDetailPage from "./pages/JobDetailPage"
 import AnalysisPage from "./pages/AnalysisPage"
 import Navbar from "./components/Navbar"
 import RegisterPage from "./pages/RegisterPage"
+import { useAuth } from "./context/AuthContext"
+import LandingPage from "./pages/LandingPage"
 
+function Home() {
+  const { token } = useAuth()
+  return token ? <Navigate to="/dashboard" replace /> : <LandingPage />
+}
 function App() {
   return (
     <BrowserRouter>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route 
