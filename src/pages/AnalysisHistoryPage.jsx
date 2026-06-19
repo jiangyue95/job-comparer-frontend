@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { getAnalyses } from "../api/analysisApi"
+import { deleteAnalysis, getAnalyses } from "../api/analysisApi"
 import { Link } from "react-router-dom"
 import AnalysisResult from "../components/AnalysisResult"
 
@@ -24,6 +24,18 @@ function AnalysisHistoryPage() {
         }
         loadAnalysis()
     }, [])
+
+    async function handleDelete(id) {
+        if (!window.confirm('Delete this analysis? This cannot be undone.')) {
+            return
+        }
+        try {
+            await deleteAnalysis(id)
+            setAnalyses(analyses.filter((a) => a.id != id))
+        } catch (err) {
+            setError(err.message)
+        }
+    }
 
     if (loading) {
         return (
@@ -102,6 +114,12 @@ function AnalysisHistoryPage() {
                                     className="text-sm font-medium text-blue-600 hover:text-blue-800"
                                 >
                                     {expandedId === analysis.id ? 'Collapse' : 'View details'}
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(analysis.id)}
+                                    className="text-sm font-medium text-red-600 hover:text-red-800"
+                                >
+                                    Delete
                                 </button>
                             </div>
                         </div>
