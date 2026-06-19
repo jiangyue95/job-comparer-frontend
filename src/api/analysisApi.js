@@ -12,3 +12,9 @@ export function getAnalyses() {
         method: 'GET',
     })
 }
+
+export function deleteAnalysis(id) {
+    return apiRequest(`/api/analyses/${id}`, {
+        method: 'DELETE',
+    })
+}
