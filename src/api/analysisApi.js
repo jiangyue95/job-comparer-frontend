@@ -6,3 +6,9 @@ export function createAnalysis(cvId, jobId) {
         body:{ cvId, jobId},
     })
 }
+
+export function getAnalyses() {
+    return apiRequest('/api/analyses', {
+        method: 'GET',
+    })
+}

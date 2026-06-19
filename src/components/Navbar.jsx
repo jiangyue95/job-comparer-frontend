@@ -31,6 +31,7 @@ function Navbar() {
                     <NavLink to="/cvs" className={linkClass}>CVs</NavLink>
                     <NavLink to="/jobs" className={linkClass}>Jobs</NavLink>
                     <NavLink to="/analyze" className={linkClass}>Analyze</NavLink>
+                    <NavLink to="/history" className={linkClass}>History</NavLink>
                 </div>
 
                 {/* Right side: username + logout */}
