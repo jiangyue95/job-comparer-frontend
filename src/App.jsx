@@ -1,16 +1,17 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import ProtectedRoute from "./components/ProtectedRoute"
+import Navbar from "./components/Navbar"
+import { useAuth } from "./context/AuthContext"
+import JobListPage from "./pages/JobListPage"
+import JobDetailPage from "./pages/JobDetailPage"
 import LoginPage from "./pages/LoginPage"
 import DashboardPage from "./pages/DashboardPage"
 import CvListPage from "./pages/CvListPage"
 import CvDetailPage from "./pages/CvDetailPage"
-import ProtectedRoute from "./components/ProtectedRoute"
-import JobListPage from "./pages/JobListPage"
-import JobDetailPage from "./pages/JobDetailPage"
 import AnalysisPage from "./pages/AnalysisPage"
-import Navbar from "./components/Navbar"
 import RegisterPage from "./pages/RegisterPage"
-import { useAuth } from "./context/AuthContext"
 import LandingPage from "./pages/LandingPage"
+import AnalysisHistoryPage from "./pages/AnalysisHistoryPage"
 
 function Home() {
   const { token } = useAuth()
@@ -69,6 +70,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AnalysisPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <AnalysisHistoryPage />
             </ProtectedRoute>
           }
         />
