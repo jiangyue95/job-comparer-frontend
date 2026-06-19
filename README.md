@@ -1,38 +1,18 @@
 # Job Comparer — Frontend
 
-React + Vite + Tailwind CSS frontend for the [Job Comparer backend](https://github.com/jiangyue95/job-comparer).
+The React frontend for **Job Comparer**, an AI-powered CV-to-job matching app.
 
-An AI-powered job application tracker that analyzes how well a CV matches a job 
-description.
+🔗 **Live demo: https://jobs.yuejiang.net**
 
-## Features
+👉 For the full project overview, architecture, and key engineering decisions, 
+see the **[main repository](https://github.com/jiangyue95/job-comparer)**.
 
-- Email / password authentication with JWT
-- Create and list CVs
-- Create and list job applications with status tracking
-- AI-powered analysis: match score, matched skills, missing skills, actionable 
-feedback
-
-## Tech stack
-
-- React with Vite
+## Tech Stack
+- React 19, Vite
 - React Router
 - Tailwind CSS
-- Fetch API
+- Context API (auth state)
 
-## Getting started
-
-1. Make sure the [backend](https://github.com/jiangyue95/job-comparer) is 
-running on `http://localhost:8080`.
-2. Install dependencies and start the dev server:
-
-   ```bash
-      npm install
-      npm run dev
-   ```
-
-3. Open `http://localhost:5173` in your browser.
-
-## Screenshots
-
-(optional - add a few PNG screenshots here later)
+## Running
+This frontend is built and served as part of the full stack via Docker Compose. 
+See the [main repository](https://github.com/jiangyue95/job-comparer) for setup.
