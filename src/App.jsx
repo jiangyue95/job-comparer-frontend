@@ -12,6 +12,7 @@ import AnalysisPage from "./pages/AnalysisPage"
 import RegisterPage from "./pages/RegisterPage"
 import LandingPage from "./pages/LandingPage"
 import AnalysisHistoryPage from "./pages/AnalysisHistoryPage"
+import JobCreatePage from "./pages/JobCreatePage"
 
 function Home() {
   const { token } = useAuth()
@@ -56,6 +57,14 @@ function App() {
               <JobListPage />
             </ProtectedRoute>
           } 
+        />
+        <Route
+          path="/jobs/new"
+          element={
+            <ProtectedRoute>
+              <JobCreatePage />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/jobs/:id"
