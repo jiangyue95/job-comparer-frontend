@@ -1,11 +1,36 @@
 import { useState } from "react"
-import { createCv } from "../api/cvApi"
+import { createCv, parseCvPdf } from "../api/cvApi"
 function CvCreateForm({ onSuccess }) {
     const [cvName, setCvName] = useState('')
     const [content, setContent] = useState('')
     const [submitting, setSubmitting] = useState(false)
+
     // Error information only belongs to this form
     const [error, setError] = useState('')
+
+    const [parsing, setParsing] = useState(false)
+    const [parseError, setParseError] = useState('')
+
+    async function handlePdfUpload(event) {
+        const file = event.target.files[0]
+        if (!file) {
+            return
+        }
+
+        setParsing(true)
+        setParseError('')
+        try {
+            const result = await parseCvPdf(file, '', false)
+            setCvName(result.name || '')
+            setContent(result.rawText || '')
+        } catch (err) {
+            setError(err.message)
+        } finally {
+            setParsing(false)
+            event.target.value = ''
+        }
+        
+    }
 
     async function handleSubmit(event) {
         event.preventDefault()
@@ -25,6 +50,24 @@ function CvCreateForm({ onSuccess }) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
+
+            <div className="border border-dashed order-gray-300 rounded-md p-4 text-center">
+                <p className="text-sm text-gray-500 mb-2">
+                    Upload a PDF to auto-fill the form
+                </p>
+                <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium py-1.5 px-3 rounded-md transition-colors">
+                    {parsing ? 'Parsing...' : 'Upload PDF'}
+                    <input
+                        type="file"
+                        accept=".pdf"
+                        onChange={handlePdfUpload}
+                        disabled={parsing}
+                        className="hidden"
+                    />
+                </label>
+                {parseError && <p className="text-red-600 text-sm mt-2">{parseError}</p>}
+            </div>
+
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
                 <input
