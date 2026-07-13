@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { register as apiRegister } from "../api/authApi";
-import { useAuth } from "../context/AuthContext";
+import { useState } from "react"
+import { useNavigate, Link } from "react-router-dom"
+import { register as apiRegister } from "../api/authApi"
+import { useAuth } from "../context/AuthContext"
+import Modal from "../components/Modal"
+import AvatarUpload from "../components/AvatarUpload"
 
 function RegisterPage() {
     const [username, setUsername] = useState('')
@@ -10,9 +12,15 @@ function RegisterPage() {
     const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
+    const [showAvatarModal, setShowAvatarModal] = useState(false)
 
     const { login } = useAuth()
     const navigate = useNavigate()
+
+    function handleAvatarDone() {
+        setShowAvatarModal(false)
+        navigate('/dashboard')
+    }
 
     async function handleSubmit(event) {
         event.preventDefault()
@@ -27,7 +35,7 @@ function RegisterPage() {
         try {
             const data = await apiRegister(username, email, password)
             login(data.token)
-            navigate('/dashboard')
+            setShowAvatarModal(true)
         } catch (err) {
             setError(err.message)
         } finally {
@@ -95,6 +103,20 @@ function RegisterPage() {
                         {loading ? 'Creating account...' : 'Sign up'}
                     </button>
                 </form>
+
+                <Modal
+                    isOpen={showAvatarModal}
+                    onClose={handleAvatarDone}
+                    title="Add a profile photo (optional)"
+                >
+                    <AvatarUpload onUploaded={handleAvatarDone} />
+                    <button
+                        onClick={handleAvatarDone}
+                        className="mt-4 text-sm text-gray-500 hover:text-gray-700"
+                    >
+                        Skip for now
+                    </button>
+                </Modal>
 
                 {error && <p className="mt-4 text-sm text-red-600 text-center">{error}</p>}
 

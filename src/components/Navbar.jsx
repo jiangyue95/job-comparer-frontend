@@ -37,9 +37,19 @@ function Navbar() {
                 {/* Right side: username + logout */}
                 <div className="flex items-center gap-4">
                     {user && (
-                        <span className="text-sm text-gray-700">
-                            Hi, {user.username}
-                        </span>
+                        <NavLink to="/profile" className="flex items-center gap-2 hover:opacity-80">
+                            {user.avatarUrl ? (
+                                <img src={user.avatarUrl} alt="avatar"
+                                     className="w-8 h-8 rounded-full object-cover" />
+                            ) : (
+                                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-500">
+                                    {user.username?.[0]?.toUpperCase()}
+                                </div>
+                            )}
+                            <span className="text-sm text-gray-700">
+                                Hi, {user.username}
+                            </span>
+                        </NavLink>
                     )}
                     <button
                         onClick={handleLogout}

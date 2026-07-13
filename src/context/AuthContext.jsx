@@ -17,14 +17,7 @@ export function AuthProvider({ children }) {
             setUser(null)
             return
         }
-        getCurrentUser()
-            .then((data) => setUser(data))
-            .catch(() => {
-                // token could expire: clear login state
-                localStorage.removeItem('token')
-                setToken(null)
-                setUser(null)
-            })
+        refreshUser()
     }, [token])
 
     function login(newToken) {
@@ -38,12 +31,23 @@ export function AuthProvider({ children }) {
         setUser(null)
     }
 
+    function refreshUser() {
+        return getCurrentUser()
+            .then((data) => setUser(data))
+            .catch(() => {
+                localStorage.removeItem('token')
+                setToken(null)
+                setUser(null)
+            })
+    }
+
     const value = {
         token,
         user,
         isAuthenticated: !!token, // !! transfer any value into boolean
         login,
         logout,
+        refreshUser,
     }
 
     return (
