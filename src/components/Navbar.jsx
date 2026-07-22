@@ -32,6 +32,9 @@ function Navbar() {
                     <NavLink to="/jobs" className={linkClass}>Jobs</NavLink>
                     <NavLink to="/analyze" className={linkClass}>Analyze</NavLink>
                     <NavLink to="/history" className={linkClass}>History</NavLink>
+                    {user?.role === 'ADMIN' && (
+                        <NavLink to="/admin" className={linkClass}>Admin</NavLink>
+                    )}
                 </div>
 
                 {/* Right side: username + logout */}

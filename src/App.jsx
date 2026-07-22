@@ -14,6 +14,11 @@ import LandingPage from "./pages/LandingPage"
 import AnalysisHistoryPage from "./pages/AnalysisHistoryPage"
 import JobCreatePage from "./pages/JobCreatePage"
 import ProfilePage from "./pages/ProfilePage"
+import AdminRoute from "./components/AdminRoute"
+import AuditLogsPage from "./pages/AuditLogsPage"
+import UserListPage from "./pages/UserListPage"
+import AdminLayout from "./components/AdminLayout"
+
 
 function Home() {
   const { token } = useAuth()
@@ -99,6 +104,18 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route index element={<Navigate to="users" replace />} />
+          <Route path="users" element={<UserListPage />} />
+          <Route path="audit-logs" element={<AuditLogsPage />} />
+        </Route>
         <Route path="*" element={
           <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <p className="text-gray-500">Page not found</p>

@@ -11,12 +11,15 @@ export function AuthProvider({ children }) {
     // (keep login state, even refresh pages)
     const [token, setToken] = useState(() => localStorage.getItem('token'))
     const [user, setUser] = useState(null)
+    const [loadingUser, setLoadingUser] = useState(!!token)
 
     useEffect(() => {
         if (!token) {
             setUser(null)
+            setLoadingUser(false)
             return
         }
+        setLoadingUser(true)
         refreshUser()
     }, [token])
 
@@ -39,6 +42,7 @@ export function AuthProvider({ children }) {
                 setToken(null)
                 setUser(null)
             })
+            .finally(() => setLoadingUser(false))
     }
 
     const value = {
@@ -48,6 +52,7 @@ export function AuthProvider({ children }) {
         login,
         logout,
         refreshUser,
+        loadingUser,
     }
 
     return (
