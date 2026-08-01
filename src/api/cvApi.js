@@ -1,4 +1,4 @@
-import { apiRequest } from "./client"
+import { apiRequest, throwApiError } from "./client"
 
 export function listCvs() {
     return apiRequest("/api/cvs")
@@ -31,8 +31,7 @@ export function parseCvPdf(file, cvName, save) {
         body: formData,
     }).then(async response => {
         if (!response.ok) {
-            const errorBody = await response.json().catch(() => ({}))
-            throw new Error(errorBody.message || `HTTP ${response.status}`)
+            await throwApiError(response)
         }
         return response.json()
     })
