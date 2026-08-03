@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useState } from "react";
-import { getCurrentUser } from "../api/authApi";
+import { createContext, useCallback, useContext, useEffect, useState } from "react"
+import { getCurrentUser } from "../api/authApi"
+import { setUnauthorizedHandler } from "../api/client"
 
 // 1. Create context object
 const AuthContext = createContext(null)
@@ -12,6 +13,20 @@ export function AuthProvider({ children }) {
     const [token, setToken] = useState(() => localStorage.getItem('token'))
     const [user, setUser] = useState(null)
     const [loadingUser, setLoadingUser] = useState(!!token)
+
+    const logout = useCallback(() => {
+        localStorage.removeItem('token')
+        setToken(null)
+        setUser(null)
+    }, [])
+
+    // Register logout as a global 401 handler.
+    // The cleanup clears it so client.js does not keep a stale reference
+    // after the provider unmounts.
+    useEffect(() => {
+        setUnauthorizedHandler(logout)
+        return () => setUnauthorizedHandler(null)
+    }, [logout])
 
     useEffect(() => {
         if (!token) {
@@ -26,12 +41,6 @@ export function AuthProvider({ children }) {
     function login(newToken) {
         localStorage.setItem('token', newToken)
         setToken(newToken)
-    }
-
-    function logout() {
-        localStorage.removeItem('token')
-        setToken(null)
-        setUser(null)
     }
 
     function refreshUser() {

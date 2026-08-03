@@ -1,3 +1,5 @@
+import { throwApiError } from "./client"
+
 export function uploadAvatar(file) {
     const token = localStorage.getItem('token')
 
@@ -12,8 +14,7 @@ export function uploadAvatar(file) {
         body: formData,
     }).then(async response => {
         if (!response.ok) {
-            const errorBody = await response.json().catch(() => ({}))
-            throw new Error(errorBody.message || `HTTP ${response.status}`)
+            await throwApiError(response)
         }
 
         return null;
