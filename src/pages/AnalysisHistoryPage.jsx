@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { deleteAnalysis, getAnalyses } from "../api/analysisApi"
 import { Link } from "react-router-dom"
 import AnalysisResult from "../components/AnalysisResult"
+import { AI_PROVIDER_COLORS, AI_PROVIDER_LABELS } from "../constants/aiProvider"
 
 function AnalysisHistoryPage() {
     const [analyses, setAnalyses] = useState([])
@@ -88,10 +89,15 @@ function AnalysisHistoryPage() {
                                 </span>
                             </div>
 
-                            {/* Date */}
-                            <p className="text-xs text-gray-400 mt-1">
-                                {new Date(analysis.createdAt).toLocaleString()}
-                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                                {/* Date */}
+                                <span className="text-xs text-gray-400">
+                                    {new Date(analysis.createdAt).toLocaleString()}
+                                </span>
+                                <span className={`inline-block px-2 py-1 text-xs font-medium rounded ${AI_PROVIDER_COLORS[analysis.aiProvider]}`}>
+                                    {AI_PROVIDER_LABELS[analysis.aiProvider] ?? analysis.aiProvider}
+                                </span>
+                            </div>
 
                             {/* Feedback preview (only when collapsed) */}
                             {expandedId !== analysis.id && (
