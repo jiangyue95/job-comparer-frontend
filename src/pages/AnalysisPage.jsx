@@ -4,6 +4,7 @@ import { listJobs } from "../api/jobApi";
 import { createAnalysis } from "../api/analysisApi";
 import { Link } from "react-router-dom";
 import AnalysisResult from '../components/AnalysisResult';
+import { AI_PROVIDER_LABELS, AI_PROVIDER_OPTIONS, DEFAULT_AI_PROVIDER } from '../constants/aiProvider'
 
 function AnalysisPage() {
     // Two dropdown data source
@@ -14,6 +15,7 @@ function AnalysisPage() {
     // User selections
     const [selectedCvId, setSelectedCvId] = useState('')
     const [selectedJobId, setSelectedJobId] = useState('')
+    const [selectedProvider, setSelectedProvider] = useState(DEFAULT_AI_PROVIDER)
 
     // Submit and result
     const [analyzing, setAnalyzing] = useState(false)
@@ -43,7 +45,7 @@ function AnalysisPage() {
         setResult(null)
         setAnalyzing(true)
         try {
-            const data = await createAnalysis(Number(selectedCvId), Number(selectedJobId))
+            const data = await createAnalysis(Number(selectedCvId), Number(selectedJobId), selectedProvider)
             setResult(data)
         } catch (err) {
             setError(err.message)
@@ -129,6 +131,22 @@ function AnalysisPage() {
                                 {jobs.map((job) => (
                                     <option key={job.id} value={job.id}>
                                         {job.jobTitle} @ {job.company}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Select an AI provider</label>
+                            <select
+                                value={selectedProvider}
+                                onChange={(e) => setSelectedProvider(e.target.value)}
+                                required
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                {AI_PROVIDER_OPTIONS.map((provider) => (
+                                    <option key={provider} value={provider}>
+                                        {AI_PROVIDER_LABELS[provider]}
                                     </option>
                                 ))}
                             </select>

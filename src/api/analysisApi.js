@@ -1,9 +1,9 @@
 import { apiRequest } from "./client";
 
-export function createAnalysis(cvId, jobId) {
+export function createAnalysis(cvId, jobId, aiProvider) {
     return apiRequest('/api/analyses', {
         method: 'POST',
-        body:{ cvId, jobId},
+        body:{ cvId, jobId, aiProvider },
     })
 }
 

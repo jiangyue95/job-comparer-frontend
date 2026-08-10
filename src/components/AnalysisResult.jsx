@@ -1,9 +1,16 @@
+import { AI_PROVIDER_COLORS, AI_PROVIDER_LABELS } from "../constants/aiProvider"
+
 function AnalysisResult({ result }) {
     const scoreColor = result.matchScore >= 70 ? 'bg-green-600' : result.matchScore >= 50 ? 'bg-yellow-500' : 'bg-red-600'
 
     return (
         <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-            <h2 className="text-xl font-semibold">Analysis Result</h2>
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Analysis Result</h2>
+                <span className={`inline-block px-2 py-1 text-xs font-medium rounded ${AI_PROVIDER_COLORS[result.aiProvider]}`}>
+                    {AI_PROVIDER_LABELS[result.aiProvider] ?? result.aiProvider}
+                </span>
+            </div>
             <div className="flex items-baseline justify-between">
                 <span className="text-sm font-medium text-gray-700">Match Score</span>
                 <span className="text-2xl font-bold text-gray-900">
