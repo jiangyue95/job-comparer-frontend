@@ -18,3 +18,15 @@ export function deleteAnalysis(id) {
         method: 'DELETE',
     })
 }
+
+export function markAnalysisViewed(id) {
+    return apiRequest(`/api/analyses/${id}/viewed`, {
+        method: 'PATCH',
+    })
+}
+
+export function getAnalysisSummary() {
+    return apiRequest('/api/analyses/summary', {
+        method: 'GET',
+    })
+}
