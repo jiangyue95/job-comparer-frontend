@@ -15,7 +15,9 @@ export function AnalysisProvider({ children }) {
     // Read inside the polling callback, which would otherwise capture a stale
     // value from the render it was created in.
     const summaryRef = useRef(summary)
-    summaryRef.current = summary
+    useEffect(() => {
+        summaryRef.current = summary
+    }, [summary])
 
     const refreshSummary = useCallback(() => {
         if (!isAuthenticated) return Promise.resolve()
@@ -33,11 +35,13 @@ export function AnalysisProvider({ children }) {
         }
         
         let timeoutId
+        let cancelled = false
 
         const tick = async () => {
             if (document.visibilityState === 'visible') {
                 await refreshSummary()
             }
+            if (cancelled) return
             const delay = summaryRef.current.active > 0 ? ACTIVE_INTERVAL : IDLE_INTERVAL
             timeoutId = setTimeout(tick, delay)
         }
@@ -45,19 +49,25 @@ export function AnalysisProvider({ children }) {
         tick()
 
         // Coming back to the tab should not wait out a 30s idle interval.
+        // Restarting the chain instead of firing a bare request keeps a single
+        // timer alive and gives back-to-back tab switches nothing to pile up.
         const onVisibilityChange = () => {
-            if (document.visibilityState === 'visible') refreshSummary()
+            if (document.visibilityState === 'visible') {
+                clearTimeout(timeoutId)
+                tick()
+            }
         }
     
         document.addEventListener('visibilitychange', onVisibilityChange)
 
         return () => {
+            cancelled = true
             clearTimeout(timeoutId)
             document.removeEventListener('visibilitychange', onVisibilityChange)
         }
     }, [isAuthenticated, refreshSummary])
 
-    const value = { summary, refreshSummary}
+    const value = { summary, refreshSummary }
 
     return (
         <AnalysisContext.Provider value={value}>
