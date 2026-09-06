@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react"
-import { deleteAnalysis, getAnalyses } from "../api/analysisApi"
+import { deleteAnalysis, getAnalyses, markAnalysisViewed } from "../api/analysisApi"
+import { useAnalysisSummary } from "../context/AnalysisContext"
 import { Link } from "react-router-dom"
-import AnalysisResult from "../components/AnalysisResult"
-import { AI_PROVIDER_COLORS, AI_PROVIDER_LABELS } from "../constants/aiProvider"
+import AnalysisCard from "../components/AnalysisCard"
 
 function AnalysisHistoryPage() {
     const [analyses, setAnalyses] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const [expandedId, setExpandedId] = useState(null)
+    const { refreshSummary } = useAnalysisSummary()
 
     // Load analysis list data
     useEffect(() => {
@@ -32,9 +33,32 @@ function AnalysisHistoryPage() {
         }
         try {
             await deleteAnalysis(id)
-            setAnalyses(analyses.filter((a) => a.id != id))
+            setAnalyses((prev) => prev.filter((a) => a.id !== id))
+            refreshSummary()
         } catch (err) {
             setError(err.message)
+        }
+    }
+
+    function handleToggleExpand(analysis) {
+        const willExpand = expandedId !== analysis.id
+        setExpandedId(willExpand ? analysis.id : null)
+
+        // Only the first expand needs to reach the server; the endpoint is
+        // idempotent, but skipping the call avoids a request per toggle.
+        if (willExpand && !analysis.viewedAt) {
+            markAnalysisViewed(analysis.id)
+                .then(() => {
+                    refreshSummary()
+                    setAnalyses((prev) =>
+                        prev.map((a) =>
+                            a.id === analysis.id ? { ...a, viewedAt: new Date().toISOString() } : a
+                        )
+                    )
+                })
+                .catch(() => {
+                    // Marking as viewed is not worth interrupting the user for.
+                })
         }
     }
 
@@ -67,70 +91,15 @@ function AnalysisHistoryPage() {
 
                 {error && <p className="text-red-600 text-center">{error}</p>}
 
-                {analyses.map((analysis) => {
-                    const scoreTextColor =
-                        analysis.matchScore >= 70 ? 'text-green-600'
-                        : analysis.matchScore >= 50 ? 'text-yellow-600'
-                        : 'text-red-600'
-                    
-                    return (
-                        <div
-                            key={analysis.id}
-                            className="bg-white rounded-lg shadow-md p-6"
-                        >
-                            {/* Summary row */}
-                            <div className="flex items-baseline justify-between">
-                                <span className="font-semibold text-gray-900">
-                                    {analysis.cvName || 'Unknown CV'} -&gt; {analysis.jobTitle || 'Unknown Job'}
-                                    {analysis.company ? ` @ ${analysis.company}` : ''}
-                                </span>
-                                <span className={`text-lg font-bold ${scoreTextColor}`}>
-                                    {analysis.matchScore}<span className="text-sm text-gray-500"> / 100</span>
-                                </span>
-                            </div>
-
-                            <div className="flex items-center gap-2 mt-1">
-                                {/* Date */}
-                                <span className="text-xs text-gray-400">
-                                    {new Date(analysis.createdAt).toLocaleString()}
-                                </span>
-                                <span className={`inline-block px-2 py-1 text-xs font-medium rounded ${AI_PROVIDER_COLORS[analysis.aiProvider]}`}>
-                                    {AI_PROVIDER_LABELS[analysis.aiProvider] ?? analysis.aiProvider}
-                                </span>
-                            </div>
-
-                            {/* Feedback preview (only when collapsed) */}
-                            {expandedId !== analysis.id && (
-                                <p className="line-clamp-2 text-sm text-gray-600 mt-2">
-                                    {analysis.actionableFeedback}
-                                </p>
-                            )}
-
-                            {/* Expanded full result */}
-                            {expandedId === analysis.id && (
-                                <div className="mt-4">
-                                    <AnalysisResult result={analysis} />
-                                </div>
-                            )}
-
-                            {/* Action buttons */}
-                            <div className="mt-4 flex gap-3">
-                                <button
-                                    onClick={() => setExpandedId(expandedId === analysis.id ? null : analysis.id)}
-                                    className="text-sm font-medium text-blue-600 hover:text-blue-800"
-                                >
-                                    {expandedId === analysis.id ? 'Collapse' : 'View details'}
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(analysis.id)}
-                                    className="text-sm font-medium text-red-600 hover:text-red-800"
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
-                    )
-                })}
+                {analyses.map((analysis) => (
+                    <AnalysisCard
+                        key={analysis.id}
+                        analysis={analysis}
+                        expanded={expandedId === analysis.id}
+                        onToggle={() => handleToggleExpand(analysis)}
+                        onDelete={() => handleDelete(analysis.id)}
+                    />
+                ))}
             </div>
         </div>
     )

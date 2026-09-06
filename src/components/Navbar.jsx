@@ -1,8 +1,10 @@
 import { NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
+import { useAnalysisSummary } from "../context/AnalysisContext"
 
 function Navbar() {
     const { isAuthenticated, logout, user } = useAuth()
+    const { summary } = useAnalysisSummary()
     const navigate = useNavigate()
 
     function handleLogout() {
@@ -31,7 +33,19 @@ function Navbar() {
                     <NavLink to="/cvs" className={linkClass}>CVs</NavLink>
                     <NavLink to="/jobs" className={linkClass}>Jobs</NavLink>
                     <NavLink to="/analyze" className={linkClass}>Analyze</NavLink>
-                    <NavLink to="/history" className={linkClass}>History</NavLink>
+                    <div className="relative">
+                        <NavLink to="/history" className={linkClass}>History</NavLink>
+                        {summary.unread > 0 && (
+                            <span
+                                className="absolute -top-1 -right-1 min-w-4.5 h-4.5 px-1
+                                           flex items-center justify-center
+                                           rounded-full bg-red-500 text-white text-[10px] font-medium"
+                                aria-label={`${summary.unread} unread ${summary.unread === 1 ? 'analysis' : 'analyses'}`}
+                            >
+                                {summary.unread > 9 ? '9+' : summary.unread}
+                            </span>
+                        )}
+                    </div>
                     {user?.role === 'ADMIN' && (
                         <NavLink to="/admin" className={linkClass}>Admin</NavLink>
                     )}
