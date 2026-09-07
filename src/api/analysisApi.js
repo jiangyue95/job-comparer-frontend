@@ -30,3 +30,9 @@ export function getAnalysisSummary() {
         method: 'GET',
     })
 }
+
+export function getAnalysis(id) {
+    return apiRequest(`/api/analyses/${id}`, {
+        method: 'GET',
+    })
+}
