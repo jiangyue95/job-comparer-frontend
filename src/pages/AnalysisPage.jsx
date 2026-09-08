@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
+import { useAnalysisSummary } from "../context/AnalysisContext"
 import { listCvs } from "../api/cvApi";
 import { listJobs } from "../api/jobApi";
-import { createAnalysis } from "../api/analysisApi";
+import { createAnalysis, getAnalysis } from "../api/analysisApi"
 import { Link } from "react-router-dom";
 import AnalysisResult from '../components/AnalysisResult';
 import { AI_PROVIDER_LABELS, AI_PROVIDER_OPTIONS, DEFAULT_AI_PROVIDER } from '../constants/aiProvider'
+import { ANALYSIS_STATUS, FAILURE_MESSAGES, isTerminal } from "../constants/analysisStatus"
+
+const POLL_INTERVAL = 2000
 
 function AnalysisPage() {
     // Two dropdown data source
@@ -18,9 +22,11 @@ function AnalysisPage() {
     const [selectedProvider, setSelectedProvider] = useState(DEFAULT_AI_PROVIDER)
 
     // Submit and result
-    const [analyzing, setAnalyzing] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
     const [result, setResult] = useState(null)
     const [error, setError] = useState('')
+
+    const { refreshSummary } = useAnalysisSummary()
 
     // Load two lists in parallel
     useEffect(() => {
@@ -39,18 +45,55 @@ function AnalysisPage() {
         loadLists()
     }, [])
 
+    // Poll the submitted analysis until it reaches a terminal state. The submit
+    // response is a PENDING shell; the result is filled in by a background
+    // thread on the server.
+    useEffect(() => {
+        if (!result || isTerminal(result.status)) return
+
+        const id = result.id
+        let timeoutId
+        let cancelled = false
+
+        const tick = async () => {
+            try {
+                const latest = await getAnalysis(id)
+                if (cancelled) return
+                setResult(latest)
+                if (isTerminal(latest.status)) {
+                    refreshSummary()
+                    return
+                }
+            } catch {
+                // A failed poll is not worth surfacing: the next tick retries.
+            }
+            if (cancelled) return
+            timeoutId = setTimeout(tick, POLL_INTERVAL)
+        }
+
+        timeoutId = setTimeout(tick, POLL_INTERVAL)
+
+        return () => {
+            cancelled = true
+            clearTimeout(timeoutId)
+        }
+    }, [result?.id, result?.status, refreshSummary])
+
     async function handleAnalyze(event) {
         event.preventDefault()
         setError('')
         setResult(null)
-        setAnalyzing(true)
+        setSubmitting(true)
         try {
-            const data = await createAnalysis(Number(selectedCvId), Number(selectedJobId), selectedProvider)
-            setResult(data)
+            const created = await createAnalysis(
+                Number(selectedCvId), Number(selectedJobId), selectedProvider)
+            setResult(created)
+            // A new active analysis switches the navbar poll to its fast interval.
+            refreshSummary()
         } catch (err) {
             setError(err.message)
         } finally {
-            setAnalyzing(false)
+            setSubmitting(false)
         }
     }
 
@@ -154,16 +197,35 @@ function AnalysisPage() {
 
                         <button 
                             type="submit" 
-                            disabled={analyzing}
+                            disabled={submitting}
                             className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
                         >
-                            {analyzing ? 'Analyzing... (this may take 10-30 seconds)' : 'Analyze'}
+                            {submitting ? 'Submitting...' : 'Analyze'}
                         </button>
                     </form>
                     {error && <p className="text-red-600">{error}</p>}
                 </div>
 
-                {result && <AnalysisResult result={result} />}
+                {result && !isTerminal(result.status) && (
+                    <div className="bg-white rounded-lg shadow-md p-6 text-center space-y-2">
+                        <p className="text-gray-700 font-medium">
+                            {result.status === ANALYSIS_STATUS.PENDING ? 'Queued...' : 'Analyzing...'}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                            This usually takes 10-30 seconds. You can leave this page;
+                            the result will be waiting in your history.
+                        </p>
+                    </div>
+                )}
+
+                {result?.status === ANALYSIS_STATUS.FAILED && (
+                    <div className="bg-white rounded-lg shadow-md p-6 text-center">
+                        <p className="text-red-600">
+                            {FAILURE_MESSAGES[result.failureReason] ?? FAILURE_MESSAGES.INTERNAL_ERROR}
+                        </p>
+                    </div>
+                )}
+                {result?.status === ANALYSIS_STATUS.COMPLETED && <AnalysisResult result={result} />}
             </div>
         </div>
     )
